@@ -1,4 +1,4 @@
-package csen1003.main.assignment2;
+package csen1002.main.assignment2;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
