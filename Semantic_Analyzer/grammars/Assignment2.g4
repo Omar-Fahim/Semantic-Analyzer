@@ -10,34 +10,54 @@ grammar Assignment2;
 
 s returns [int val]
  // Write the definition of parser rule "s" here
-  @init { $val = 0; }
-      : firstDigit=Digit ( ',' secondDigit=Digit totalNoOfExtremas=noOfExtermas[Integer.parseInt($firstDigit.text),Integer.parseInt($secondDigit.text)] { $val = $totalNoOfExtremas.extremas; } )?
+  @init {
+      $val = 0;
+      int firstDigit = 0;
+      int secondDigit = 0;
+  }
+      : digit { firstDigit = $digit.value; }
+        (',' digit { secondDigit = $digit.value; }
+         total=noOfExtermas[firstDigit, secondDigit] { $val = $total.extremas; }
+        )?
       ;
-
-
 
 
 // Write additional lexer and parser rules here
 
-noOfExtermas[int digit1, int digit2] returns [int extremas]
+noOfExtermas[int firstDigit, int secondDigit] returns [int extremas]
 @init {
-  int extrema = 0;
-  $extremas = 0;
+    int extremaCount = 0;
+    int previousPreviousDigit = firstDigit;
+    int previousDigit = secondDigit;
+
 }
-    : ',' digit3=Digit recursiveExtermaCount=noOfExtermas[$digit2, Integer.parseInt($digit3.text)]
-      {
-        if (($digit1 < $digit2 && $digit2 > Integer.parseInt($digit3.text)) || ($digit1 > $digit2 && $digit2 < Integer.parseInt($digit3.text))) {
-            extrema = 1;
-        }
-        $extremas = extrema + $recursiveExtermaCount.extremas;
-      }
+    : (',' digit {
+          int currentDigit = $digit.value;
+          if ((previousPreviousDigit < previousDigit && previousDigit > currentDigit) ||
+              (previousPreviousDigit > previousDigit && previousDigit < currentDigit)) {
+              extremaCount++;
+          }
+          previousPreviousDigit = previousDigit;
+          previousDigit = currentDigit;
+      })+
+      { $extremas = extremaCount; }
     | { $extremas = 0; }
     ;
 
 
 
-
-Digit: [0-9];
+digit returns [int value]
+    : '0' { $value = 0; }
+    | '1' { $value = 1; }
+    | '2' { $value = 2; }
+    | '3' { $value = 3; }
+    | '4' { $value = 4; }
+    | '5' { $value = 5; }
+    | '6' { $value = 6; }
+    | '7' { $value = 7; }
+    | '8' { $value = 8; }
+    | '9' { $value = 9; }
+    ;
 
 
 
