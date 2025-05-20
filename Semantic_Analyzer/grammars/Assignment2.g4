@@ -9,41 +9,51 @@
 grammar Assignment2;
 
 s returns [int val]
+
  // Write the definition of parser rule "s" here
   @init {
       $val = 0;
-      int firstDigit = 0;
-      int secondDigit = 0;
+      int d1 = 0;
+      int d2 = 0;
+      int d3 = 0;
   }
-      : digit { firstDigit = $digit.value; }
-        (',' digit { secondDigit = $digit.value; }
-         total=noOfExtermas[firstDigit, secondDigit] { $val = $total.extremas; }
+      : digit { d1 = $digit.value; }
+        (',' digit { d2 = $digit.value; }
+          (
+            ',' digit { d3 = $digit.value; }
+            total=noOfExtermas[d1, d2, d3] { $val = $total.extremas; }
+          )?
         )?
       ;
 
-
 // Write additional lexer and parser rules here
 
-noOfExtermas[int firstDigit, int secondDigit] returns [int extremas]
+noOfExtermas[int digit1, int digit2, int digit3] returns [int extremas]
 @init {
     int extremaCount = 0;
-    int previousPreviousDigit = firstDigit;
-    int previousDigit = secondDigit;
+    int d1 = digit1;
+    int d2 = digit2;
+    int d3 = digit3;
 
+
+    if ((d1 < d2 && d2 > d3) || (d1 > d2 && d2 < d3)) {
+        extremaCount++;
+    }
 }
     : (',' digit {
-          int currentDigit = $digit.value;
-          if ((previousPreviousDigit < previousDigit && previousDigit > currentDigit) ||
-              (previousPreviousDigit > previousDigit && previousDigit < currentDigit)) {
+          int next = $digit.value;
+
+          d1 = d2;
+          d2 = d3;
+          d3 = next;
+
+          if ((d1 < d2 && d2 > d3) || (d1 > d2 && d2 < d3)) {
               extremaCount++;
           }
-          previousPreviousDigit = previousDigit;
-          previousDigit = currentDigit;
-      })+
+      })*
       { $extremas = extremaCount; }
     | { $extremas = 0; }
     ;
-
 
 
 digit returns [int value]
